@@ -43,35 +43,3 @@ export function extractTocItems(content: string, maxLevel = 3): TocItem[] {
     .filter((item) => item.text && item.level <= maxLevel);
 }
 
-export function plainTextToMarkdown(value: string) {
-  const lines = value.replace(/\r\n/g, "\n").split("\n");
-  let firstContentLineSeen = false;
-
-  return lines
-    .map((rawLine) => {
-      const line = rawLine.trim();
-
-      if (!line) return "";
-      if (/^#{1,6}\s/.test(line)) return line;
-      if (/^([-*+]\s|\d+[.)]\s|>\s)/.test(line)) return line;
-
-      if (!firstContentLineSeen && line.length <= 40) {
-        firstContentLineSeen = true;
-        return `# ${line}`;
-      }
-
-      firstContentLineSeen = true;
-
-      if (/^(一|二|三|四|五|六|七|八|九|十|第.+章|第.+节|[0-9]+[、.])/.test(line) && line.length <= 60) {
-        return `## ${line.replace(/^[0-9]+[、.]\s*/, "")}`;
-      }
-
-      if (/[:：]$/.test(line) && line.length <= 50) {
-        return `### ${line.replace(/[:：]$/, "")}`;
-      }
-
-      return line;
-    })
-    .join("\n\n")
-    .replace(/\n{3,}/g, "\n\n");
-}

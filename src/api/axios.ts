@@ -87,13 +87,4 @@ http.interceptors.response.use(
   }
 );
 
-// 创建可取消请求的工具函数
-export function createCancelToken() {
-  const controller = new AbortController();
-  return {
-    token: controller.signal,
-    cancel: () => controller.abort("请求已取消"),
-  };
-}
-
 export default http;

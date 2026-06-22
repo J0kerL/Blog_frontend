@@ -13,16 +13,6 @@ export interface PageResult<T> {
   list: T[];
 }
 
-// ========== Pagination & Search ==========
-export interface PaginationParams {
-  pageNum?: number;
-  pageSize?: number;
-}
-
-export interface SearchParams extends PaginationParams {
-  keyword?: string;
-}
-
 // ========== User ==========
 export type UserRole = 'ROLE_USER' | 'ROLE_ADMIN';
 

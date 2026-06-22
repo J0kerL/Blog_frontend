@@ -3,7 +3,7 @@ import { useAuthStore } from "@/store/authStore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Eye, Clock, FileText } from "lucide-react";
-import { formatDate, truncate, readingTime } from "@/lib/utils";
+import { formatDate, truncate } from "@/lib/utils";
 import type { PostListVO } from "@/types";
 
 interface PostCardProps {

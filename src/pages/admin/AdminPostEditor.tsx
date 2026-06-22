@@ -71,7 +71,6 @@ export default function AdminPostEditor() {
     },
   });
 
-  const content = watch("content");
   const coverImage = watch("coverImage");
   const selectedCategoryIds = watch("categoryIds") || [];
   const selectedTagIds = watch("tagIds") || [];
