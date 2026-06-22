@@ -285,7 +285,7 @@ export default function MarkdownEditor({ value, onChange, height = 560 }: Props)
 
   return (
     <div className="overflow-hidden rounded-2xl border bg-card shadow-sm">
-      <div className="flex flex-wrap items-center gap-1 border-b bg-muted/40 p-2">
+      <div className="flex flex-wrap items-center gap-1 border-b bg-muted/40 p-2 overflow-x-auto">
         {toolbarItems.map((item) => (
           <Button
             key={item.label}
@@ -344,12 +344,12 @@ export default function MarkdownEditor({ value, onChange, height = 560 }: Props)
           <Redo2 className="h-4 w-4" />
         </Button>
 
-        <div className="ml-auto hidden text-xs text-muted-foreground md:block">
+        <div className="ml-auto hidden text-xs text-muted-foreground lg:block">
           所见即所得编辑，保存时自动转为 Markdown
         </div>
       </div>
 
-      <div className="overflow-y-auto bg-background px-6 py-5" style={{ minHeight: height, maxHeight: Math.max(height, 720) }}>
+      <div className="overflow-y-auto bg-background px-4 sm:px-6 py-5" style={{ minHeight: Math.min(height, 400), maxHeight: Math.max(height, 720) }}>
         <EditorContent editor={editor} />
       </div>
     </div>

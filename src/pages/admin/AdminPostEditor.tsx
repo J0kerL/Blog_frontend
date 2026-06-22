@@ -156,26 +156,27 @@ export default function AdminPostEditor() {
       </Helmet>
 
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="icon" onClick={() => navigate("/admin/posts")}>
               <ArrowLeft className="w-4 h-4" />
             </Button>
-            <h1 className="text-2xl font-bold text-foreground">{isEdit ? "编辑文章" : "新建文章"}</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-foreground">{isEdit ? "编辑文章" : "新建文章"}</h1>
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={handleSave} disabled={saving}>
-              <Save className="w-4 h-4 mr-2" />
-              {isEdit ? "保存修改" : "存为草稿"}
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <Button variant="outline" onClick={handleSave} disabled={saving} className="flex-1 sm:flex-none">
+              <Save className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">{isEdit ? "保存修改" : "存为草稿"}</span>
+              <span className="sm:hidden">保存</span>
             </Button>
-            <Button onClick={handlePublish} disabled={saving}>
-              <Send className="w-4 h-4 mr-2" />
-              {saving ? "保存中..." : "发布"}
+            <Button onClick={handlePublish} disabled={saving} className="flex-1 sm:flex-none">
+              <Send className="w-4 h-4 sm:mr-2" />
+              <span>{saving ? "保存中..." : "发布"}</span>
             </Button>
           </div>
         </div>
 
-        <div className="flex gap-6">
+        <div className="flex flex-col lg:flex-row gap-6">
           <div className="flex-1 space-y-6 min-w-0">
             <div>
               <Input
@@ -211,7 +212,7 @@ export default function AdminPostEditor() {
             </div>
           </div>
 
-          <div className="w-80 shrink-0 space-y-6">
+          <div className="w-full lg:w-80 lg:shrink-0 space-y-6">
             <div>
               <Label className="text-sm font-medium mb-2 block">封面图片</Label>
               <ImageUploader value={coverImage} onChange={(url) => setValue("coverImage", url, { shouldDirty: true })} />

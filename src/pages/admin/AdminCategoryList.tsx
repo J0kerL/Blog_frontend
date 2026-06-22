@@ -90,14 +90,14 @@ export default function AdminCategoryList() {
         <title>分类管理 - Blog Admin</title>
       </Helmet>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <h1 className="text-2xl font-bold text-foreground">分类管理</h1>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 w-full sm:w-auto">
             <Input
               placeholder="搜索分类..."
               value={searchKeyword}
               onChange={(e) => setSearchKeyword(e.target.value)}
-              className="w-64"
+              className="w-full sm:w-64"
             />
             <Button onClick={openCreate}>
               <Plus className="w-4 h-4 mr-2" />
@@ -106,7 +106,8 @@ export default function AdminCategoryList() {
           </div>
         </div>
 
-        <div className="border rounded-xl overflow-hidden">
+        <div className="table-scroll">
+        <div className="border rounded-xl overflow-hidden min-w-[640px]">
           <Table>
             <TableHeader>
               <TableRow>
@@ -150,8 +151,7 @@ export default function AdminCategoryList() {
             </TableBody>
           </Table>
         </div>
-
-        {/* Create/Edit dialog */}
+        </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogContent>
             <DialogHeader>

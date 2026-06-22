@@ -44,7 +44,7 @@ export default function ImageUploader({ value, onChange }: Props) {
           <img
             src={value}
             alt="cover"
-            className="w-full h-48 object-contain rounded-xl border bg-muted/30"
+            className="w-full h-36 sm:h-48 object-contain rounded-xl border bg-muted/30"
           />
           <button
             onClick={() => onChange("")}
@@ -56,7 +56,7 @@ export default function ImageUploader({ value, onChange }: Props) {
       ) : (
         <div
           onClick={() => inputRef.current?.click()}
-          className="w-full h-48 border-2 border-dashed rounded-xl flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors"
+          className="w-full h-36 sm:h-48 border-2 border-dashed rounded-xl flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors"
         >
           {uploading ? (
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />

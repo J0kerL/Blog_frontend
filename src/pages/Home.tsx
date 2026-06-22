@@ -9,7 +9,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight, FolderOpen, Tags } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import { useState, useEffect, useRef } from "react";
-import ScrollToTop from "@/components/ScrollToTop";
 
 const TITLE_TEXT = "Welcome to Blog";
 const SUBTITLE_TEXT = "分享技术见解，记录编程旅程。探索最新的前端、后端和 AI 技术文章。";
@@ -75,13 +74,13 @@ export default function Home() {
 
       {/* Hero */}
       <section className="relative overflow-hidden bg-gradient-to-b from-primary/5 via-background to-background">
-        <div className="container mx-auto px-4 py-20 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4 tracking-tight min-h-[1.2em]">
+        <div className="container mx-auto px-4 py-12 sm:py-16 md:py-20 text-center">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-4 tracking-tight min-h-[1.2em]">
             {title}
             <span className="inline-block w-[2px] h-[0.85em] bg-foreground align-middle ml-0.5 animate-pulse" />
           </h1>
           <p
-            className={`text-lg text-muted-foreground max-w-2xl mx-auto mb-8 leading-relaxed transition-all duration-700 ease-out ${
+            className={`text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto mb-8 leading-relaxed transition-all duration-700 ease-out ${
               subtitleVisible
                 ? "opacity-100 translate-x-0"
                 : "opacity-0 -translate-x-4"
@@ -89,14 +88,11 @@ export default function Home() {
           >
             {SUBTITLE_TEXT}
           </p>
-          <div className="flex items-center justify-center gap-3">
+          <div className="flex items-center justify-center">
             <Button asChild size="lg">
               <Link to="/posts">
                 浏览文章 <ArrowRight className="w-4 h-4 ml-2" />
               </Link>
-            </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link to="/categories">探索分类</Link>
             </Button>
           </div>
         </div>
@@ -135,7 +131,7 @@ export default function Home() {
                 分类
               </h3>
               <div className="flex flex-wrap gap-2">
-                {categories?.map((cat) => (
+                {categories?.slice(0, 5).map((cat) => (
                   <Link key={cat.id} to={`/posts?categoryId=${cat.id}`}>
                     <Badge variant="secondary" className="hover:bg-primary/10 transition-colors cursor-pointer">
                       {cat.name}
@@ -158,7 +154,7 @@ export default function Home() {
                 标签
               </h3>
               <div className="flex flex-wrap gap-2">
-                {tags?.map((tag) => (
+                {tags?.slice(0, 5).map((tag) => (
                   <Link key={tag.id} to={`/posts?tagId=${tag.id}`}>
                     <Badge variant="outline" className="hover:bg-primary/10 transition-colors cursor-pointer">
                       {tag.name}
@@ -175,7 +171,6 @@ export default function Home() {
         </div>
       </div>
 
-      <ScrollToTop />
     </>
   );
 }

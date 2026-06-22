@@ -77,16 +77,16 @@ export default function AdminCommentList() {
         <title>评论管理 - Blog Admin</title>
       </Helmet>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <h1 className="text-2xl font-bold text-foreground">评论管理</h1>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 w-full sm:w-auto">
             <Input
               placeholder="搜索评论..."
               value={keyword}
               onChange={(e) => { setKeyword(e.target.value); setPageNum(1); }}
-              className="w-64"
+              className="w-full sm:w-64"
             />
-            <span className="text-sm text-muted-foreground">共 {data?.total || 0} 条</span>
+            <span className="text-sm text-muted-foreground shrink-0">共 {data?.total || 0} 条</span>
           </div>
         </div>
 
@@ -104,7 +104,8 @@ export default function AdminCommentList() {
           ))}
         </div>
 
-        <div className="border rounded-xl overflow-hidden">
+        <div className="table-scroll">
+        <div className="border rounded-xl overflow-hidden min-w-[720px]">
           <Table>
             <TableHeader>
               <TableRow>
@@ -181,6 +182,7 @@ export default function AdminCommentList() {
               )}
             </TableBody>
           </Table>
+        </div>
         </div>
 
         {pages > 1 && (

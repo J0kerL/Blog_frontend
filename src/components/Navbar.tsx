@@ -21,6 +21,8 @@ export default function Navbar() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [searchParams] = useSearchParams();
+  const hasCategoryId = !!searchParams.get("categoryId");
+  const hasTagId = !!searchParams.get("tagId");
   const [keyword, setKeyword] = useState(searchParams.get("q") || "");
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -28,13 +30,50 @@ export default function Navbar() {
     document.documentElement.classList.toggle("dark", theme === "dark");
   }, [theme]);
 
+  // 路由变化时关闭移动菜单
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
+
+  // 从 URL 同步搜索关键词
+  useEffect(() => {
+    const q = searchParams.get("q") || "";
+    if (q !== keyword) {
+      setKeyword(q);
+    }
+  }, [searchParams]);
+
+  // 移动菜单打开时锁定 body 滚动
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileOpen]);
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (keyword.trim()) {
-      navigate(`/search?q=${encodeURIComponent(keyword.trim())}`);
+      navigate(`/posts?q=${encodeURIComponent(keyword.trim())}`);
       setMobileOpen(false);
     }
   };
+
+  // 实时搜索：输入立即跳转，清空时回到全部文章
+  useEffect(() => {
+    const trimmed = keyword.trim();
+    const currentQ = searchParams.get("q") || "";
+    if (trimmed) {
+      if (pathname !== "/posts" || currentQ !== trimmed) {
+        navigate(`/posts?q=${encodeURIComponent(trimmed)}`);
+      }
+    } else if (currentQ) {
+      // 清空搜索框时移除 q 参数，回到全部文章
+      navigate("/posts");
+    }
+  }, [keyword]);
 
   const handleLogout = async () => {
     try {
@@ -67,10 +106,18 @@ export default function Navbar() {
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-1">
           {navLinks.map((link) => {
-            const isActive =
-              link.to === "/"
-                ? pathname === "/"
-                : pathname.startsWith(link.to);
+            let isActive: boolean;
+            if (link.to === "/") {
+              isActive = pathname === "/";
+            } else if (link.to === "/categories") {
+              isActive = pathname === "/categories" || (pathname === "/posts" && hasCategoryId);
+            } else if (link.to === "/tags") {
+              isActive = pathname === "/tags" || (pathname === "/posts" && hasTagId);
+            } else if (link.to === "/posts") {
+              isActive = pathname.startsWith("/posts") && !hasCategoryId && !hasTagId;
+            } else {
+              isActive = pathname.startsWith(link.to);
+            }
             return (
               <Link
                 key={link.to}
@@ -101,15 +148,15 @@ export default function Navbar() {
         </form>
 
         {/* Right side */}
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={toggleTheme}>
+        <div className="flex items-center gap-1 sm:gap-2">
+          <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-10 w-10">
             {theme === "light" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
           </Button>
 
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="gap-2">
+                <Button variant="ghost" size="sm" className="gap-2 h-10">
                   {user.avatar ? (
                     <img
                       src={user.avatar}
@@ -143,21 +190,31 @@ export default function Navbar() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Button asChild size="sm">
+            <Button asChild size="sm" className="h-10 px-4">
               <Link to="/login">登录</Link>
             </Button>
           )}
 
           {/* Mobile menu toggle */}
-          <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileOpen(!mobileOpen)}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden h-10 w-10"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label={mobileOpen ? "关闭菜单" : "打开菜单"}
+          >
             {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </Button>
         </div>
       </div>
 
-      {/* Mobile menu */}
-      {mobileOpen && (
-        <div className="md:hidden border-t bg-background p-4 space-y-3">
+      {/* Mobile menu with slide-down animation */}
+      <div
+        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
+          mobileOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
+        }`}
+      >
+        <div className="border-t bg-background p-4 space-y-3">
           <form onSubmit={handleSearch} className="flex gap-2">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -165,23 +222,31 @@ export default function Navbar() {
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
                 placeholder="搜索文章..."
-                className="pl-9"
+                className="pl-9 h-11"
               />
             </div>
-            <Button type="submit" size="sm">搜索</Button>
+            <Button type="submit" size="sm" className="h-11 px-5">搜索</Button>
           </form>
           <nav className="space-y-1">
             {navLinks.map((link) => {
-              const isActive =
-                link.to === "/"
-                  ? pathname === "/"
-                  : pathname.startsWith(link.to);
+              let isActive: boolean;
+              if (link.to === "/") {
+                isActive = pathname === "/";
+              } else if (link.to === "/categories") {
+                isActive = pathname === "/categories" || (pathname === "/posts" && hasCategoryId);
+              } else if (link.to === "/tags") {
+                isActive = pathname === "/tags" || (pathname === "/posts" && hasTagId);
+              } else if (link.to === "/posts") {
+                isActive = pathname.startsWith("/posts") && !hasCategoryId && !hasTagId;
+              } else {
+                isActive = pathname.startsWith(link.to);
+              }
               return (
                 <Link
                   key={link.to}
                   to={link.to}
                   onClick={() => setMobileOpen(false)}
-                  className={`block px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                  className={`block px-4 py-3 text-base font-medium rounded-lg transition-colors ${
                     isActive
                       ? "text-foreground bg-accent"
                       : "text-muted-foreground hover:text-foreground hover:bg-accent"
@@ -193,7 +258,7 @@ export default function Navbar() {
             })}
           </nav>
         </div>
-      )}
+      </div>
     </header>
   );
 }

@@ -20,9 +20,9 @@ export default function SearchResults() {
         <title>搜索: {keyword} - Blog</title>
       </Helmet>
       <div className="container mx-auto px-4 py-12">
-        <div className="flex items-center gap-3 mb-8">
-          <Search className="w-6 h-6 text-primary" />
-          <h1 className="text-3xl font-bold text-foreground">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 mb-8">
+          <Search className="w-6 h-6 text-primary shrink-0" />
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
             搜索结果: {keyword}
           </h1>
           <span className="text-muted-foreground">({data?.total || 0} 篇)</span>

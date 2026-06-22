@@ -104,7 +104,7 @@ export default function AdminPostList() {
 
       <TooltipProvider>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <h1 className="text-2xl font-bold text-foreground">文章管理</h1>
           <Button onClick={() => navigate("/admin/posts/new")}>
             <Plus className="w-4 h-4 mr-2" />
@@ -150,7 +150,8 @@ export default function AdminPostList() {
         </div>
 
         {/* Table */}
-        <div className="border rounded-xl overflow-hidden">
+        <div className="table-scroll">
+        <div className="border rounded-xl overflow-hidden min-w-[640px]">
           <Table>
             <TableHeader>
               <TableRow>
@@ -245,6 +246,7 @@ export default function AdminPostList() {
               )}
             </TableBody>
           </Table>
+        </div>
         </div>
 
         {/* Pagination */}

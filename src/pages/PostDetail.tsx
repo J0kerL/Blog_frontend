@@ -4,6 +4,7 @@ import { useAuthStore } from "@/store/authStore";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
 import TableOfContents from "@/components/TableOfContents";
 import CommentSection from "@/components/CommentSection";
+import ScrollToTop from "@/components/ScrollToTop";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -11,6 +12,7 @@ import { Eye, Calendar, Clock, ArrowLeft } from "lucide-react";
 import { formatDate, readingTime } from "@/lib/utils";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 export default function PostDetail() {
   const { id, slug } = useParams();
@@ -21,6 +23,13 @@ export default function PostDetail() {
   const fromAdmin = (location.state as any)?.from === "admin";
 
   const { data: post, isLoading } = slug ? usePostBySlug(slug) : usePost(Number(id));
+
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 200);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   if (isLoading) {
     return (
@@ -46,19 +55,27 @@ export default function PostDetail() {
         <meta name="description" content={post.summary} />
       </Helmet>
 
-      <div className="mx-auto max-w-7xl px-4 py-8 lg:px-8">
-        {/* Admin back button */}
-        {isAdmin && fromAdmin && (
-          <div className="mb-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate("/admin/posts")}
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-          </div>
-        )}
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:py-8 lg:px-8">
+        {/* Back button - sticky when scrolled */}
+        <div className={`mb-4 z-40 transition-all duration-300 ${
+          scrolled ? "fixed top-20 left-4 mb-0" : "relative"
+        }`}>
+          <Button
+            variant="ghost"
+            size="sm"
+            className={scrolled ? "shadow-md bg-background/90 backdrop-blur-sm" : ""}
+            onClick={() => {
+              if (isAdmin && fromAdmin) {
+                navigate("/admin/posts");
+              } else {
+                navigate(-1);
+              }
+            }}
+          >
+            <ArrowLeft className="w-4 h-4 mr-1" />
+            {isAdmin && fromAdmin ? "返回管理" : "返回"}
+          </Button>
+        </div>
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_18rem]">
           {/* Main content */}
@@ -81,12 +98,12 @@ export default function PostDetail() {
                 ))}
               </div>
 
-              <h1 className="text-3xl md:text-4xl font-bold text-foreground leading-tight mb-4">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground leading-tight mb-4">
                 {post.title}
               </h1>
 
               {post.summary && (
-                <p className="text-lg text-muted-foreground leading-relaxed mb-6">
+                <p className="text-base sm:text-lg text-muted-foreground leading-relaxed mb-6">
                   {post.summary}
                 </p>
               )}
@@ -140,6 +157,8 @@ export default function PostDetail() {
           </aside>
         </div>
       </div>
+
+      <ScrollToTop />
     </>
   );
 }

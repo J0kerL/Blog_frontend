@@ -7,7 +7,7 @@ import { FileText, FolderOpen, Tags, MessageSquare, Eye } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 
 export default function Dashboard() {
-  const { data: postData } = useAdminPosts({ pageNum: 1, pageSize: 1 });
+  const { data: postData } = useAdminPosts({ pageNum: 1, pageSize: 5 });
   const { data: categories } = useAdminCategories();
   const { data: tags } = useAdminTags();
   const { data: commentData } = useAdminComments({ pageNum: 1, pageSize: 1 });

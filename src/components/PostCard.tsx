@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Eye, Clock } from "lucide-react";
+import { Eye, Clock, FileText } from "lucide-react";
 import { formatDate, truncate, readingTime } from "@/lib/utils";
 import type { PostListVO } from "@/types";
 
@@ -12,17 +12,21 @@ interface PostCardProps {
 export default function PostCard({ post }: PostCardProps) {
   return (
     <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-      {post.coverImage && (
-        <Link to={`/post/slug/${post.slug}`}>
-          <div className="aspect-video overflow-hidden">
+      <Link to={`/post/slug/${post.slug}`}>
+        <div className="aspect-video overflow-hidden">
+          {post.coverImage ? (
             <img
               src={post.coverImage}
               alt={post.title}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
-          </div>
-        </Link>
-      )}
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-primary/10 via-primary/5 to-muted flex items-center justify-center group-hover:from-primary/15 transition-all duration-500">
+              <FileText className="w-12 h-12 text-primary/30" />
+            </div>
+          )}
+        </div>
+      </Link>
       <CardContent className="p-5">
         {/* Categories & Tags */}
         <div className="flex flex-wrap gap-1.5 mb-3">
@@ -53,8 +57,8 @@ export default function PostCard({ post }: PostCardProps) {
         </Link>
 
         {/* Summary */}
-        <p className="text-sm text-muted-foreground line-clamp-2 mb-4 leading-relaxed">
-          {truncate(post.summary || "", 120)}
+        <p className="text-sm text-muted-foreground line-clamp-2 mb-4 leading-relaxed min-h-[2.5rem]">
+          {truncate(post.summary || "", 120) || "\u00A0"}
         </p>
 
         {/* Meta */}

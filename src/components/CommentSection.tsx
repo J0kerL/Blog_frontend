@@ -58,7 +58,7 @@ function CommentItem({ comment, postId, depth = 0 }: { comment: CommentVO; postI
   };
 
   return (
-    <div className={depth > 0 ? "ml-10 mt-3" : ""}>
+    <div className={depth > 0 ? "ml-4 sm:ml-10 mt-3" : ""}>
       <div className="flex gap-3">
         <Avatar className="w-8 h-8 shrink-0">
           <AvatarImage src={comment.avatar} />

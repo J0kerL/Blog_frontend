@@ -13,9 +13,11 @@ import {
   Moon,
   LogOut,
   ChevronLeft,
+  Menu,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 const navItems = [
   { to: "/admin", icon: LayoutDashboard, label: "仪表盘", end: true },
   { to: "/admin/posts", icon: FileText, label: "文章管理" },
@@ -29,10 +31,26 @@ export default function AdminLayout() {
   const { user, logout } = useAuthStore();
   const { theme, toggleTheme } = useThemeStore();
   const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
   }, [theme]);
+
+  // 路由切换时自动关闭移动端侧边栏
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [navigate]);
+
+  // 打开侧边栏时锁定 body 滚动
+  useEffect(() => {
+    if (sidebarOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [sidebarOpen]);
 
   const handleLogout = async () => {
     try {
@@ -49,12 +67,28 @@ export default function AdminLayout() {
 
   return (
     <div className="min-h-screen flex bg-background">
+      {/* Mobile overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 lg:hidden transition-opacity"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-64 border-r bg-card flex flex-col fixed h-screen">
-        <div className="h-16 px-6 border-b flex items-center">
+      <aside
+        className={cn(
+          "w-64 border-r bg-card flex flex-col fixed h-screen z-50 transition-transform duration-300 ease-in-out",
+          "lg:translate-x-0",
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        )}
+      >
+        {/* Sidebar header */}
+        <div className="h-16 px-6 border-b flex items-center justify-between">
           <NavLink
             to="/admin"
             className="flex items-center gap-2"
+            onClick={() => setSidebarOpen(false)}
           >
             <span className="text-2xl font-bold tracking-tight text-foreground">
               Diamond
@@ -63,14 +97,22 @@ export default function AdminLayout() {
               Admin
             </span>
           </NavLink>
+          {/* Close button (mobile only) */}
+          <button
+            onClick={() => setSidebarOpen(false)}
+            className="lg:hidden p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
-        <nav className="flex-1 p-4 space-y-1">
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           {navItems.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
               end={item.end}
+              onClick={() => setSidebarOpen(false)}
               className={({ isActive }) =>
                 cn(
                   "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all",
@@ -96,6 +138,7 @@ export default function AdminLayout() {
           </button>
           <NavLink
             to="/"
+            onClick={() => setSidebarOpen(false)}
             className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-all"
           >
             <ChevronLeft className="w-4 h-4" />
@@ -112,10 +155,20 @@ export default function AdminLayout() {
       </aside>
 
       {/* Main content */}
-      <div className="flex-1 ml-64">
+      <div className="flex-1 lg:ml-64">
         {/* Top bar */}
-        <header className="h-16 border-b bg-card/80 backdrop-blur-sm sticky top-0 z-10 flex items-center justify-between px-8">
-          <h2 className="text-lg font-semibold text-foreground">后台管理</h2>
+        <header className="h-16 border-b bg-card/80 backdrop-blur-sm sticky top-0 z-30 flex items-center justify-between px-4 sm:px-8">
+          <div className="flex items-center gap-3">
+            {/* Hamburger button (mobile only) */}
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden p-2 -ml-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+              aria-label="打开菜单"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+            <h2 className="text-lg font-semibold text-foreground">后台管理</h2>
+          </div>
           <div className="flex items-center gap-2">
             {user?.avatar ? (
               <img
@@ -128,14 +181,14 @@ export default function AdminLayout() {
                 {displayName[0].toUpperCase()}
               </div>
             )}
-            <span className="text-sm text-muted-foreground">
+            <span className="text-sm text-muted-foreground hidden sm:inline">
               {displayName}
             </span>
           </div>
         </header>
 
         {/* Page content */}
-        <div className="p-8">
+        <div className="p-4 sm:p-6 md:p-8">
           <Outlet />
         </div>
       </div>

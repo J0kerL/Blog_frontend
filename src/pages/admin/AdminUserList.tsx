@@ -153,7 +153,8 @@ export default function AdminUserList() {
         </div>
 
         {/* Table */}
-        <div className="border rounded-xl overflow-hidden">
+        <div className="table-scroll">
+        <div className="border rounded-xl overflow-hidden min-w-[720px]">
           <Table>
             <TableHeader>
               <TableRow>
@@ -267,8 +268,7 @@ export default function AdminUserList() {
             </TableBody>
           </Table>
         </div>
-
-        {/* Pagination */}
+        </div>
         {pages > 1 && (
           <div className="flex items-center justify-center gap-2">
             <Button variant="outline" size="sm" disabled={pageNum <= 1} onClick={() => setPageNum(pageNum - 1)}>

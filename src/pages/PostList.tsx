@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Helmet } from "react-helmet-async";
-import ScrollToTop from "@/components/ScrollToTop";
 
 export default function PostList() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -153,7 +152,6 @@ export default function PostList() {
         )}
       </div>
 
-      <ScrollToTop />
     </>
   );
 }

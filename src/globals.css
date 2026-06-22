@@ -56,6 +56,13 @@
   body {
     @apply bg-background text-foreground antialiased;
   }
+  /* Mobile touch optimization */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+  button, a, [role="button"] {
+    touch-action: manipulation;
+  }
 }
 
 /* Markdown content styles */
@@ -94,6 +101,10 @@
 .markdown-body table {
   @apply w-full border-collapse my-4;
 }
+/* Responsive table wrapper */
+.markdown-body .table-wrapper {
+  @apply overflow-x-auto rounded-lg my-4;
+}
 .markdown-body th {
   @apply border border-border bg-muted px-4 py-2 text-left font-semibold;
 }
@@ -113,6 +124,16 @@
 }
 .w-md-editor-toolbar {
   @apply !rounded-t-xl;
+}
+
+/* Admin table scroll container */
+.table-scroll {
+  @apply overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0;
+}
+
+/* Mobile-optimized scrollbar */
+@media (max-width: 768px) {
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
 }
 
 /* Tiptap rich editor */

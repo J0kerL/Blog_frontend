@@ -48,7 +48,7 @@ export default function Footer() {
 
   return (
     <footer className="bg-slate-100 text-slate-600">
-      <div className="container mx-auto px-4 py-5">
+      <div className="container mx-auto px-4 py-6 sm:py-5">
         {/* 三栏布局 */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
           {/* 左侧：Copyright */}
@@ -82,32 +82,32 @@ export default function Footer() {
             >
               京ICP备2026007336号
             </a>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               {/* GitHub */}
               <a
                 href="https://github.com/J0kerL"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="GitHub"
-                className="text-slate-400 hover:text-slate-700 transition-colors"
+                className="text-slate-400 hover:text-slate-700 transition-colors p-2 -m-2"
               >
-                <Github size={18} strokeWidth={1.5} />
+                <Github size={20} strokeWidth={1.5} />
               </a>
               {/* 邮箱 - 弹窗 */}
               <button
                 onClick={() => openContact("email")}
                 aria-label="邮箱"
-                className="text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
+                className="text-slate-400 hover:text-slate-700 transition-colors cursor-pointer p-2 -m-2"
               >
-                <Mail size={18} strokeWidth={1.5} />
+                <Mail size={20} strokeWidth={1.5} />
               </button>
               {/* QQ - 弹窗 */}
               <button
                 onClick={() => openContact("qq")}
                 aria-label="QQ"
-                className="text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
+                className="text-slate-400 hover:text-slate-700 transition-colors cursor-pointer p-2 -m-2"
               >
-                <QQIcon size={18} />
+                <QQIcon size={20} />
               </button>
             </div>
           </div>
