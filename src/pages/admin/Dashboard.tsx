@@ -5,8 +5,10 @@ import { useAdminComments } from "@/hooks/useComments";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText, FolderOpen, Tags, MessageSquare, Eye } from "lucide-react";
 import { Helmet } from "react-helmet-async";
+import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const { data: postData } = useAdminPosts({ pageNum: 1, pageSize: 5 });
   const { data: categories } = useAdminCategories();
   const { data: tags } = useAdminTags();
@@ -19,6 +21,7 @@ export default function Dashboard() {
       icon: FileText,
       color: "text-blue-500",
       bg: "bg-blue-500/10",
+      link: "/admin/posts",
     },
     {
       label: "分类数量",
@@ -26,6 +29,7 @@ export default function Dashboard() {
       icon: FolderOpen,
       color: "text-green-500",
       bg: "bg-green-500/10",
+      link: "/admin/categories",
     },
     {
       label: "标签数量",
@@ -33,6 +37,7 @@ export default function Dashboard() {
       icon: Tags,
       color: "text-purple-500",
       bg: "bg-purple-500/10",
+      link: "/admin/tags",
     },
     {
       label: "评论总数",
@@ -40,6 +45,7 @@ export default function Dashboard() {
       icon: MessageSquare,
       color: "text-orange-500",
       bg: "bg-orange-500/10",
+      link: "/admin/comments",
     },
   ];
 
@@ -54,7 +60,7 @@ export default function Dashboard() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {stats.map((stat) => (
-            <Card key={stat.label}>
+            <Card key={stat.label} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate(stat.link)}>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>

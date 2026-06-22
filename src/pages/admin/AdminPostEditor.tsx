@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { ArrowLeft, Save, Send, X } from "lucide-react";
+import { ArrowLeft, Save, Send, X, Plus } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import { toast } from "sonner";
 import ImageUploader from "@/components/ImageUploader";
@@ -30,6 +30,8 @@ const schema = z.object({
   allowComment: z.number(),
   categoryIds: z.array(z.number()).optional(),
   tagIds: z.array(z.number()).optional(),
+  newCategoryNames: z.array(z.string()).optional(),
+  newTagNames: z.array(z.string()).optional(),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -74,6 +76,35 @@ export default function AdminPostEditor() {
   const selectedCategoryIds = watch("categoryIds") || [];
   const selectedTagIds = watch("tagIds") || [];
 
+  const [newCategoryNames, setNewCategoryNames] = useState<string[]>([]);
+  const [newTagNames, setNewTagNames] = useState<string[]>([]);
+  const [newCatInput, setNewCatInput] = useState("");
+  const [newTagInput, setNewTagInput] = useState("");
+
+  const addNewCategory = () => {
+    const name = newCatInput.trim();
+    if (name && !newCategoryNames.includes(name)) {
+      setNewCategoryNames([...newCategoryNames, name]);
+      setNewCatInput("");
+    }
+  };
+
+  const addNewTag = () => {
+    const name = newTagInput.trim();
+    if (name && !newTagNames.includes(name)) {
+      setNewTagNames([...newTagNames, name]);
+      setNewTagInput("");
+    }
+  };
+
+  const removeNewCategory = (name: string) => {
+    setNewCategoryNames(newCategoryNames.filter((n) => n !== name));
+  };
+
+  const removeNewTag = (name: string) => {
+    setNewTagNames(newTagNames.filter((n) => n !== name));
+  };
+
   useEffect(() => {
     if (!existingPost) return;
 
@@ -92,9 +123,14 @@ export default function AdminPostEditor() {
   }, [existingPost, reset]);
 
   const onSubmit = (data: FormData) => {
+    const payload = {
+      ...data,
+      newCategoryNames: newCategoryNames.length > 0 ? newCategoryNames : undefined,
+      newTagNames: newTagNames.length > 0 ? newTagNames : undefined,
+    };
     if (isEdit) {
       updatePost.mutate(
-        { id: Number(id), dto: data },
+        { id: Number(id), dto: payload },
         {
           onSuccess: () => {
             toast.success("更新成功");
@@ -105,7 +141,7 @@ export default function AdminPostEditor() {
       return;
     }
 
-    createPost.mutate(data, {
+    createPost.mutate(payload, {
       onSuccess: () => {
         toast.success("创建成功");
         navigate("/admin/posts");
@@ -234,6 +270,24 @@ export default function AdminPostEditor() {
                     {selectedCategoryIds.includes(category.id) && <X className="w-3 h-3 ml-1" />}
                   </Badge>
                 ))}
+                {newCategoryNames.map((name) => (
+                  <Badge key={`new-${name}`} variant="default" className="bg-green-600 hover:bg-green-700">
+                    {name}
+                    <X className="w-3 h-3 ml-1 cursor-pointer" onClick={() => removeNewCategory(name)} />
+                  </Badge>
+                ))}
+              </div>
+              <div className="flex items-center gap-1.5 mt-2">
+                <Input
+                  value={newCatInput}
+                  onChange={(e) => setNewCatInput(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addNewCategory(); } }}
+                  placeholder="新建分类..."
+                  className="h-7 text-xs flex-1"
+                />
+                <Button type="button" variant="outline" size="sm" className="h-7 px-2" onClick={addNewCategory}>
+                  <Plus className="w-3 h-3" />
+                </Button>
               </div>
             </div>
 
@@ -253,6 +307,24 @@ export default function AdminPostEditor() {
                     {selectedTagIds.includes(tag.id) && <X className="w-3 h-3 ml-1" />}
                   </Badge>
                 ))}
+                {newTagNames.map((name) => (
+                  <Badge key={`new-${name}`} variant="default" className="bg-green-600 hover:bg-green-700">
+                    {name}
+                    <X className="w-3 h-3 ml-1 cursor-pointer" onClick={() => removeNewTag(name)} />
+                  </Badge>
+                ))}
+              </div>
+              <div className="flex items-center gap-1.5 mt-2">
+                <Input
+                  value={newTagInput}
+                  onChange={(e) => setNewTagInput(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addNewTag(); } }}
+                  placeholder="新建标签..."
+                  className="h-7 text-xs flex-1"
+                />
+                <Button type="button" variant="outline" size="sm" className="h-7 px-2" onClick={addNewTag}>
+                  <Plus className="w-3 h-3" />
+                </Button>
               </div>
             </div>
 

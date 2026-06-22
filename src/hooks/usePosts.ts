@@ -85,3 +85,59 @@ export function useDeletePost() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-posts"] }),
   });
 }
+
+// ========== 用户文章 Hooks ==========
+
+export function useUserPosts(params: {
+  pageNum?: number;
+  pageSize?: number;
+  keyword?: string;
+  status?: number;
+}) {
+  return useQuery({
+    queryKey: ["user-posts", params],
+    queryFn: () => postsApi.userList(params),
+  });
+}
+
+export function useUserPost(id: number | undefined) {
+  return useQuery({
+    queryKey: ["user-post", id],
+    queryFn: () => postsApi.userGetById(id!),
+    enabled: !!id,
+  });
+}
+
+export function useCreateUserPost() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (dto: PostCreateDTO) => postsApi.userCreate(dto),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["user-posts"] }),
+  });
+}
+
+export function useUpdateUserPost() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, dto }: { id: number; dto: PostCreateDTO }) =>
+      postsApi.userUpdate(id, dto),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["user-posts"] }),
+  });
+}
+
+export function useUpdateUserPostStatus() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, status }: { id: number; status: number }) =>
+      postsApi.userUpdateStatus(id, status),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["user-posts"] }),
+  });
+}
+
+export function useDeleteUserPost() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => postsApi.userDelete(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["user-posts"] }),
+  });
+}

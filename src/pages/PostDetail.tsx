@@ -118,7 +118,7 @@ export default function PostDetail() {
                     </AvatarFallback>
                   </Avatar>
                   <span className="font-medium text-foreground">
-                    {post.author?.nickname || "匿名"}
+                    {user && post.author && user.id === post.author.id ? "我" : (post.author?.nickname || "匿名")}
                   </span>
                 </div>
                 {post.publishedAt && (

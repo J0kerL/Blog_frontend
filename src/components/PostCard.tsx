@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useAuthStore } from "@/store/authStore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Eye, Clock, FileText } from "lucide-react";
@@ -10,6 +11,9 @@ interface PostCardProps {
 }
 
 export default function PostCard({ post }: PostCardProps) {
+  const { user } = useAuthStore();
+  const isMyPost = user && post.author && user.id === post.author.id;
+  const displayName = isMyPost ? "我" : (post.author?.nickname || "匿名");
   return (
     <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
       <Link to={`/post/slug/${post.slug}`}>
@@ -67,7 +71,7 @@ export default function PostCard({ post }: PostCardProps) {
             <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary text-[10px] font-medium">
               {(post.author?.nickname || "A")[0].toUpperCase()}
             </div>
-            <span>{post.author?.nickname || "匿名"}</span>
+            <span>{displayName}</span>
           </div>
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1">

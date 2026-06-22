@@ -3,7 +3,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 const AUTH_PATHS = ["/login", "/register", "/forgot-password"];
-const FOOTER_PATHS = ["/", "/posts", "/categories", "/tags"];
+const FOOTER_PATHS = ["/", "/posts", "/categories", "/tags", "/my-posts"];
 
 export default function MainLayout() {
   const { pathname } = useLocation();

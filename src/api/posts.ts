@@ -41,4 +41,28 @@ export const postsApi = {
 
   delete: (id: number) =>
     http.delete<ApiResult<void>>(`/admin/posts/${id}`).then((r) => r.data),
+
+  // User posts (普通用户文章管理)
+  userList: (params: {
+    pageNum?: number;
+    pageSize?: number;
+    keyword?: string;
+    status?: number;
+  }) =>
+    http.get<ApiResult<PageResult<PostListVO>>>("/user/posts", { params }).then((r) => r.data.data),
+
+  userGetById: (id: number) =>
+    http.get<ApiResult<PostVO>>(`/user/posts/${id}`).then((r) => r.data.data),
+
+  userCreate: (dto: PostCreateDTO) =>
+    http.post<ApiResult<PostVO>>("/user/posts", dto).then((r) => r.data.data),
+
+  userUpdate: (id: number, dto: PostCreateDTO) =>
+    http.put<ApiResult<PostVO>>(`/user/posts/${id}`, dto).then((r) => r.data.data),
+
+  userDelete: (id: number) =>
+    http.delete<ApiResult<void>>(`/user/posts/${id}`).then((r) => r.data),
+
+  userUpdateStatus: (id: number, status: number) =>
+    http.patch<ApiResult<PostVO>>(`/user/posts/${id}/status`, { status }).then((r) => r.data.data),
 };

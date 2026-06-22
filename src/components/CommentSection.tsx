@@ -27,6 +27,7 @@ function CommentItem({ comment, postId, depth = 0 }: { comment: CommentVO; postI
   const [showAllReplies, setShowAllReplies] = useState(false);
   const { user } = useAuthStore();
   const createComment = useCreateComment();
+  const isMyComment = user && comment.nickname && user.nickname === comment.nickname;
 
   const MAX_VISIBLE_REPLIES = 3;
   const replies = comment.replies || [];
@@ -68,7 +69,7 @@ function CommentItem({ comment, postId, depth = 0 }: { comment: CommentVO; postI
         </Avatar>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-sm font-medium text-foreground">{comment.nickname || "匿名"}</span>
+            <span className="text-sm font-medium text-foreground">{isMyComment ? "我" : (comment.nickname || "匿名")}</span>
             <span className="text-xs text-muted-foreground">{formatRelativeTime(comment.createdAt)}</span>
           </div>
           <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{comment.content}</p>

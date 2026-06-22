@@ -35,6 +35,8 @@ const Login = lazy(() => import("@/pages/auth/Login"));
 const Register = lazy(() => import("@/pages/auth/Register"));
 const ForgotPassword = lazy(() => import("@/pages/auth/ForgotPassword"));
 const Profile = lazy(() => import("@/pages/Profile"));
+const UserPostEditor = lazy(() => import("@/pages/UserPostEditor"));
+const MyPosts = lazy(() => import("@/pages/MyPosts"));
 const Dashboard = lazy(() => import("@/pages/admin/Dashboard"));
 const AdminPostList = lazy(() => import("@/pages/admin/AdminPostList"));
 const AdminPostEditor = lazy(() => import("@/pages/admin/AdminPostEditor"));
@@ -69,6 +71,30 @@ export const router = createBrowserRouter([
         element: (
           <LoginGuard>
             {wrap(Profile)}
+          </LoginGuard>
+        ),
+      },
+      {
+        path: "write",
+        element: (
+          <LoginGuard>
+            {wrap(UserPostEditor)}
+          </LoginGuard>
+        ),
+      },
+      {
+        path: "write/:id",
+        element: (
+          <LoginGuard>
+            {wrap(UserPostEditor)}
+          </LoginGuard>
+        ),
+      },
+      {
+        path: "my-posts",
+        element: (
+          <LoginGuard>
+            {wrap(MyPosts)}
           </LoginGuard>
         ),
       },

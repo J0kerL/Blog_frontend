@@ -127,6 +127,8 @@ export interface PostCreateDTO {
   scheduledAt?: string;
   categoryIds?: number[];
   tagIds?: number[];
+  newCategoryNames?: string[];
+  newTagNames?: string[];
 }
 
 // ========== Category ==========

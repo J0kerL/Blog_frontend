@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Search, Sun, Moon, Menu, X, LogOut, LayoutDashboard, User } from "lucide-react";
+import { Search, Sun, Moon, Menu, X, LogOut, LayoutDashboard, User, PenLine, FileText } from "lucide-react";
 import { useState, useEffect } from "react";
 
 
@@ -149,6 +149,17 @@ export default function Navbar() {
 
         {/* Right side */}
         <div className="flex items-center gap-1 sm:gap-2">
+          {user && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="hidden sm:flex gap-1.5"
+              onClick={() => navigate("/write")}
+            >
+              <PenLine className="w-4 h-4" />
+              写文章
+            </Button>
+          )}
           <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-10 w-10">
             {theme === "light" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
           </Button>
@@ -172,6 +183,10 @@ export default function Navbar() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem onClick={() => navigate("/my-posts")}>
+                  <FileText className="w-4 h-4 mr-2" />
+                  我的文章
+                </DropdownMenuItem>
                 {user.role === "ROLE_ADMIN" && (
                   <DropdownMenuItem onClick={() => navigate("/admin")}>
                     <LayoutDashboard className="w-4 h-4 mr-2" />
@@ -257,6 +272,26 @@ export default function Navbar() {
               );
             })}
           </nav>
+          {user && (
+            <div className="border-t pt-2 space-y-1">
+              <Link
+                to="/write"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center gap-2 px-4 py-3 text-base font-medium rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+              >
+                <PenLine className="w-4 h-4" />
+                写文章
+              </Link>
+              <Link
+                to="/my-posts"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center gap-2 px-4 py-3 text-base font-medium rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+              >
+                <FileText className="w-4 h-4" />
+                我的文章
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </header>
