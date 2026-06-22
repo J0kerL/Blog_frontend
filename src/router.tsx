@@ -3,17 +3,27 @@ import { lazy, Suspense } from "react";
 import MainLayout from "@/layouts/MainLayout";
 import AdminLayout from "@/layouts/AdminLayout";
 import { useAuthStore } from "@/store/authStore";
+import type { UserRole } from "@/types";
 
-function AuthGuard({ children }: { children: React.ReactNode }) {
-  const { token, user } = useAuthStore();
-  if (!token) return <Navigate to="/login" replace />;
-  if (user?.role !== "ROLE_ADMIN") return <Navigate to="/" replace />;
-  return <>{children}</>;
+// 统一的路由守卫组件
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+  requiredRole?: UserRole;
 }
 
-function LoginGuard({ children }: { children: React.ReactNode }) {
-  const { token } = useAuthStore();
-  if (!token) return <Navigate to="/login" replace />;
+function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
+  const { token, isAuthenticated, user } = useAuthStore();
+  
+  // 检查token有效性
+  if (!token || !isAuthenticated()) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  // 检查角色权限
+  if (requiredRole && user?.role !== requiredRole) {
+    return <Navigate to="/" replace />;
+  }
+  
   return <>{children}</>;
 }
 
@@ -37,6 +47,7 @@ const ForgotPassword = lazy(() => import("@/pages/auth/ForgotPassword"));
 const Profile = lazy(() => import("@/pages/Profile"));
 const UserPostEditor = lazy(() => import("@/pages/UserPostEditor"));
 const MyPosts = lazy(() => import("@/pages/MyPosts"));
+const NotFound = lazy(() => import("@/pages/NotFound"));
 const Dashboard = lazy(() => import("@/pages/admin/Dashboard"));
 const AdminPostList = lazy(() => import("@/pages/admin/AdminPostList"));
 const AdminPostEditor = lazy(() => import("@/pages/admin/AdminPostEditor"));
@@ -69,43 +80,47 @@ export const router = createBrowserRouter([
       {
         path: "profile",
         element: (
-          <LoginGuard>
+          <ProtectedRoute>
             {wrap(Profile)}
-          </LoginGuard>
+          </ProtectedRoute>
         ),
       },
       {
         path: "write",
         element: (
-          <LoginGuard>
+          <ProtectedRoute>
             {wrap(UserPostEditor)}
-          </LoginGuard>
+          </ProtectedRoute>
         ),
       },
       {
         path: "write/:id",
         element: (
-          <LoginGuard>
+          <ProtectedRoute>
             {wrap(UserPostEditor)}
-          </LoginGuard>
+          </ProtectedRoute>
         ),
       },
       {
         path: "my-posts",
         element: (
-          <LoginGuard>
+          <ProtectedRoute>
             {wrap(MyPosts)}
-          </LoginGuard>
+          </ProtectedRoute>
         ),
+      },
+      {
+        path: "*",
+        element: wrap(NotFound),
       },
     ],
   },
   {
     path: "/admin",
     element: (
-      <AuthGuard>
+      <ProtectedRoute requiredRole="ROLE_ADMIN">
         <AdminLayout />
-      </AuthGuard>
+      </ProtectedRoute>
     ),
     children: [
       { index: true, element: wrap(Dashboard) },

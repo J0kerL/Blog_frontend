@@ -14,15 +14,25 @@ import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 
+interface LocationState {
+  from?: string;
+}
+
 export default function PostDetail() {
   const { id, slug } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuthStore();
   const isAdmin = user?.role === "ROLE_ADMIN";
-  const fromAdmin = (location.state as any)?.from === "admin";
+  const fromAdmin = (location.state as LocationState)?.from === "admin";
 
-  const { data: post, isLoading } = slug ? usePostBySlug(slug) : usePost(Number(id));
+  // 始终调用两个Hook以避免条件Hook调用
+  const { data: postBySlug, isLoading: isLoadingBySlug } = usePostBySlug(slug);
+  const { data: postById, isLoading: isLoadingById } = usePost(Number(id));
+
+  // 根据参数选择数据
+  const post = slug ? postBySlug : postById;
+  const isLoading = slug ? isLoadingBySlug : isLoadingById;
 
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {

@@ -3,7 +3,6 @@ import { usePostComments, useCreateComment } from "@/hooks/useComments";
 import { useAuthStore } from "@/store/authStore";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MessageSquare, Reply, ChevronDown, ChevronUp } from "lucide-react";
 import { formatRelativeTime } from "@/lib/utils";
@@ -59,10 +58,10 @@ function CommentItem({ comment, postId, depth = 0 }: { comment: CommentVO; postI
   };
 
   return (
-    <div className={depth > 0 ? "ml-4 sm:ml-10 mt-3" : ""}>
+    <div className={depth > 0 ? "ml-4 sm:ml-10 mt-3" : ""} role="article" aria-label={`${comment.nickname || '匿名用户'}的评论`}>
       <div className="flex gap-3">
         <Avatar className="w-8 h-8 shrink-0">
-          <AvatarImage src={comment.avatar} />
+          <AvatarImage src={comment.avatar} alt={`${comment.nickname || '匿名用户'}的头像`} />
           <AvatarFallback className="text-xs">
             {(comment.nickname || "A")[0].toUpperCase()}
           </AvatarFallback>
@@ -70,20 +69,24 @@ function CommentItem({ comment, postId, depth = 0 }: { comment: CommentVO; postI
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
             <span className="text-sm font-medium text-foreground">{isMyComment ? "我" : (comment.nickname || "匿名")}</span>
-            <span className="text-xs text-muted-foreground">{formatRelativeTime(comment.createdAt)}</span>
+            <time className="text-xs text-muted-foreground" dateTime={comment.createdAt}>
+              {formatRelativeTime(comment.createdAt)}
+            </time>
           </div>
           <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{comment.content}</p>
           {depth < 4 && (
             <button
               onClick={() => setShowReply(!showReply)}
               className="flex items-center gap-1 mt-1 text-xs text-muted-foreground hover:text-primary transition-colors"
+              aria-expanded={showReply}
+              aria-label={showReply ? "取消回复" : "回复此评论"}
             >
-              <Reply className="w-3 h-3" />
+              <Reply className="w-3 h-3" aria-hidden="true" />
               回复
             </button>
           )}
           {showReply && (
-            <div className="mt-2 space-y-2">
+            <div className="mt-2 space-y-2" role="form" aria-label="回复评论">
               <Textarea
                 value={replyContent}
                 onChange={(e) => setReplyContent(e.target.value)}
@@ -93,6 +96,7 @@ function CommentItem({ comment, postId, depth = 0 }: { comment: CommentVO; postI
                 placeholder="写下你的回复... (Enter 发送，Shift+Enter 换行)"
                 rows={2}
                 className="text-sm"
+                aria-label="回复内容"
               />
               <div className="flex gap-2">
                 <Button size="sm" onClick={handleReply} disabled={createComment.isPending}>
@@ -111,8 +115,9 @@ function CommentItem({ comment, postId, depth = 0 }: { comment: CommentVO; postI
             <button
               onClick={() => setShowAllReplies(true)}
               className="flex items-center gap-1 mt-2 text-xs text-primary hover:text-primary/80 font-medium transition-colors"
+              aria-label={`展开全部 ${hiddenCount} 条回复`}
             >
-              <ChevronDown className="w-3 h-3" />
+              <ChevronDown className="w-3 h-3" aria-hidden="true" />
               {depth === 0 ? `展开全部 ${hiddenCount} 条回复` : `展开其余 ${hiddenCount} 条回复`}
             </button>
           )}
@@ -120,8 +125,9 @@ function CommentItem({ comment, postId, depth = 0 }: { comment: CommentVO; postI
             <button
               onClick={() => setShowAllReplies(false)}
               className="flex items-center gap-1 mt-2 text-xs text-primary hover:text-primary/80 font-medium transition-colors"
+              aria-label="收起回复"
             >
-              <ChevronUp className="w-3 h-3" />
+              <ChevronUp className="w-3 h-3" aria-hidden="true" />
               收起回复
             </button>
           )}
@@ -136,7 +142,6 @@ export default function CommentSection({ postId, allowComment = 1 }: Props) {
   const createComment = useCreateComment();
   const { user } = useAuthStore();
   const [content, setContent] = useState("");
-  const [nickname, setNickname] = useState("");
 
   const handleSubmit = () => {
     if (!content.trim()) return;
@@ -144,7 +149,7 @@ export default function CommentSection({ postId, allowComment = 1 }: Props) {
       {
         postId,
         content,
-        ...(user ? {} : { nickname: nickname || "匿名用户" }),
+        ...(user ? {} : { nickname: "匿名用户" }),
       },
       {
         onSuccess: () => {
@@ -156,32 +161,25 @@ export default function CommentSection({ postId, allowComment = 1 }: Props) {
   };
 
   return (
-    <div className="space-y-6">
+    <section className="space-y-6" aria-label="评论区">
       <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
-        <MessageSquare className="w-5 h-5" />
+        <MessageSquare className="w-5 h-5" aria-hidden="true" />
         评论 ({comments?.length || 0})
       </h3>
 
       {/* New comment */}
-      <div className="space-y-3 p-4 rounded-xl bg-muted/50">
-        {!user && allowComment !== 0 && (
-          <Input
-            value={nickname}
-            onChange={(e) => setNickname(e.target.value)}
-            placeholder="你的昵称"
-            className="max-w-xs"
-          />
-        )}
+      <div className="space-y-3 p-4 rounded-xl bg-muted/50" role="form" aria-label="发表评论">
         <Textarea
           value={allowComment === 0 ? "" : content}
           onChange={(e) => allowComment !== 0 && setContent(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey && allowComment !== 0) { e.preventDefault(); handleSubmit(); }
           }}
-          placeholder={allowComment === 0 ? "作者已关闭评论功能" : (user ? "写下你的评论... (Enter 发送，Shift+Enter 换行)" : "登录后评论，或填写昵称后匿名评论...")}
+          placeholder={allowComment === 0 ? "作者已关闭评论功能" : (user ? "写下你的评论... (Enter 发送，Shift+Enter 换行)" : "登录后评论，或匿名评论...")}
           rows={3}
           disabled={allowComment === 0}
           className={allowComment === 0 ? "cursor-not-allowed opacity-70" : ""}
+          aria-label="评论内容"
         />
         <Button onClick={handleSubmit} disabled={allowComment === 0 || createComment.isPending || !content.trim()}>
           {createComment.isPending ? "发送中..." : "发表评论"}
@@ -189,7 +187,7 @@ export default function CommentSection({ postId, allowComment = 1 }: Props) {
       </div>
 
       {/* Comment list */}
-      <div className="space-y-4">
+      <div className="space-y-4" role="feed" aria-label="评论列表">
         {comments?.map((comment) => (
           <CommentItem key={comment.id} comment={comment} postId={postId} />
         ))}
@@ -199,6 +197,6 @@ export default function CommentSection({ postId, allowComment = 1 }: Props) {
           </p>
         )}
       </div>
-    </div>
+    </section>
   );
 }

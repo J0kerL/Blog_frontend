@@ -13,7 +13,19 @@ export interface PageResult<T> {
   list: T[];
 }
 
+// ========== Pagination & Search ==========
+export interface PaginationParams {
+  pageNum?: number;
+  pageSize?: number;
+}
+
+export interface SearchParams extends PaginationParams {
+  keyword?: string;
+}
+
 // ========== User ==========
+export type UserRole = 'ROLE_USER' | 'ROLE_ADMIN';
+
 export interface UserVO {
   id: number;
   username: string;
@@ -21,7 +33,7 @@ export interface UserVO {
   email: string;
   avatar: string;
   bio: string;
-  role: string;
+  role: UserRole;
   createdAt: string;
 }
 
@@ -32,7 +44,7 @@ export interface AdminUserVO {
   email: string;
   avatar: string;
   bio: string;
-  role: string;
+  role: UserRole;
   status: number;
   createdAt: string;
 }

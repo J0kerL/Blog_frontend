@@ -20,7 +20,7 @@ export default function Navbar() {
   const { theme, toggleTheme } = useThemeStore();
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const hasCategoryId = !!searchParams.get("categoryId");
   const hasTagId = !!searchParams.get("tagId");
   const [keyword, setKeyword] = useState(searchParams.get("q") || "");
@@ -56,22 +56,31 @@ export default function Navbar() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (keyword.trim()) {
-      navigate(`/posts?q=${encodeURIComponent(keyword.trim())}`);
+      // 如果不在文章页面，先导航过去
+      if (pathname !== "/posts") {
+        navigate(`/posts?q=${encodeURIComponent(keyword.trim())}`);
+      } else {
+        setSearchParams({ q: keyword.trim() }, { replace: true });
+      }
       setMobileOpen(false);
     }
   };
 
-  // 实时搜索：输入立即跳转，清空时回到全部文章
+  // 实时搜索：输入立即更新URL参数（使用replace避免历史记录堆积），清空时回到全部文章
   useEffect(() => {
     const trimmed = keyword.trim();
     const currentQ = searchParams.get("q") || "";
     if (trimmed) {
-      if (pathname !== "/posts" || currentQ !== trimmed) {
+      if (pathname !== "/posts") {
+        // 如果不在文章页面，导航到文章页面并带上搜索参数
         navigate(`/posts?q=${encodeURIComponent(trimmed)}`);
+      } else if (currentQ !== trimmed) {
+        // 在文章页面时，使用replace模式更新搜索参数
+        setSearchParams({ q: trimmed }, { replace: true });
       }
     } else if (currentQ) {
       // 清空搜索框时移除 q 参数，回到全部文章
-      navigate("/posts");
+      setSearchParams({}, { replace: true });
     }
   }, [keyword]);
 
@@ -97,14 +106,14 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-lg">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between gap-4">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 shrink-0">
+        <Link to="/" className="flex items-center gap-2 shrink-0" aria-label="返回首页">
           <span className="text-2xl font-bold tracking-tight text-foreground">
             Diamond
           </span>
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-1">
+        <nav className="hidden md:flex items-center gap-1" role="navigation" aria-label="主导航">
           {navLinks.map((link) => {
             let isActive: boolean;
             if (link.to === "/") {
@@ -122,6 +131,7 @@ export default function Navbar() {
               <Link
                 key={link.to}
                 to={link.to}
+                aria-current={isActive ? "page" : undefined}
                 className={`px-3 py-2 text-sm font-medium transition-colors rounded-lg ${
                   isActive
                     ? "text-foreground bg-accent"
@@ -135,14 +145,15 @@ export default function Navbar() {
         </nav>
 
         {/* Search */}
-        <form onSubmit={handleSearch} className="hidden md:flex items-center gap-2 flex-1 max-w-sm">
+        <form onSubmit={handleSearch} className="hidden md:flex items-center gap-2 flex-1 max-w-sm" role="search" aria-label="文章搜索">
           <div className="relative w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
             <Input
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               placeholder="搜索文章..."
               className="pl-9 bg-muted/50"
+              aria-label="搜索关键词"
             />
           </div>
         </form>
@@ -160,7 +171,13 @@ export default function Navbar() {
               写文章
             </Button>
           )}
-          <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-10 w-10">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={toggleTheme} 
+            className="h-10 w-10"
+            aria-label={theme === "light" ? "切换到暗色模式" : "切换到亮色模式"}
+          >
             {theme === "light" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
           </Button>
 
@@ -228,21 +245,25 @@ export default function Navbar() {
         className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
           mobileOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
         }`}
+        role="navigation"
+        aria-label="移动菜单"
+        aria-hidden={!mobileOpen}
       >
         <div className="border-t bg-background p-4 space-y-3">
-          <form onSubmit={handleSearch} className="flex gap-2">
+          <form onSubmit={handleSearch} className="flex gap-2" role="search" aria-label="文章搜索">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
               <Input
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
                 placeholder="搜索文章..."
                 className="pl-9 h-11"
+                aria-label="搜索关键词"
               />
             </div>
             <Button type="submit" size="sm" className="h-11 px-5">搜索</Button>
           </form>
-          <nav className="space-y-1">
+          <nav className="space-y-1" aria-label="移动端导航">
             {navLinks.map((link) => {
               let isActive: boolean;
               if (link.to === "/") {
@@ -261,6 +282,7 @@ export default function Navbar() {
                   key={link.to}
                   to={link.to}
                   onClick={() => setMobileOpen(false)}
+                  aria-current={isActive ? "page" : undefined}
                   className={`block px-4 py-3 text-base font-medium rounded-lg transition-colors ${
                     isActive
                       ? "text-foreground bg-accent"
