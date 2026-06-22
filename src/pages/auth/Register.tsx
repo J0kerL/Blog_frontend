@@ -9,6 +9,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import SliderCaptcha from "@/components/SliderCaptcha";
 import { toast } from "sonner";
 import { Helmet } from "react-helmet-async";
 import { Loader2 } from "lucide-react";
@@ -30,6 +38,10 @@ export default function Register() {
   const navigate = useNavigate();
   const { setAuth } = useAuthStore();
   const [loading, setLoading] = useState(false);
+  const [captchaOpen, setCaptchaOpen] = useState(false);
+  const [pendingData, setPendingData] = useState<FormData | null>(null);
+  const [captchaKey, setCaptchaKey] = useState("");
+  const [captchaToken, setCaptchaToken] = useState("");
 
   const {
     register,
@@ -37,21 +49,44 @@ export default function Register() {
     formState: { errors },
   } = useForm<FormData>({ resolver: zodResolver(schema) });
 
-  const onSubmit = async (data: FormData) => {
+  const submitRegister = async (
+    data: FormData,
+    verifiedCaptchaKey: string,
+    verifiedCaptchaToken: string
+  ) => {
     setLoading(true);
     try {
       const res = await authApi.register({
         ...data,
         email: data.email || undefined,
+        captchaKey: verifiedCaptchaKey,
+        captchaCode: verifiedCaptchaToken,
       });
       setAuth(res.token, res.user);
       toast.success("注册成功");
+      setCaptchaOpen(false);
       navigate("/");
     } catch {
-      // handled by interceptor
+      setCaptchaKey("");
+      setCaptchaToken("");
     } finally {
       setLoading(false);
     }
+  };
+
+  const onSubmit = (data: FormData) => {
+    setPendingData(data);
+    setCaptchaKey("");
+    setCaptchaToken("");
+    setCaptchaOpen(true);
+  };
+
+  const handleCaptchaVerified = (token: string, key: string) => {
+    if (!pendingData || !token || !key) {
+      toast.error("滑块验证失败，请重试");
+      return;
+    }
+    submitRegister(pendingData, key, token);
   };
 
   return (
@@ -82,7 +117,12 @@ export default function Register() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword">确认密码 *</Label>
-                <Input id="confirmPassword" type="password" {...register("confirmPassword")} placeholder="请再次输入密码" />
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  {...register("confirmPassword")}
+                  placeholder="请再次输入密码"
+                />
                 {errors.confirmPassword && (
                   <p className="text-xs text-destructive">{errors.confirmPassword.message}</p>
                 )}
@@ -112,6 +152,24 @@ export default function Register() {
           </CardContent>
         </Card>
       </div>
+
+      <Dialog open={captchaOpen} onOpenChange={(open) => !loading && setCaptchaOpen(open)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>完成安全验证</DialogTitle>
+            <DialogDescription>拖动滑块到最右侧后，系统会继续提交注册。</DialogDescription>
+          </DialogHeader>
+          <SliderCaptcha
+            value={captchaToken}
+            onChange={(token, key) => {
+              setCaptchaToken(token);
+              setCaptchaKey(key);
+            }}
+            onVerified={handleCaptchaVerified}
+            disabled={loading}
+          />
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

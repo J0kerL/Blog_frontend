@@ -58,6 +58,8 @@ export interface RegisterDTO {
   confirmPassword: string;
   nickname?: string;
   email?: string;
+  captchaKey: string;
+  captchaCode: string;
 }
 
 export interface UserUpdateDTO {
@@ -81,6 +83,19 @@ export interface ForgotPasswordDTO {
 export interface CaptchaVO {
   captchaKey: string;
   captchaImage: string;
+}
+
+export interface SliderCaptchaVO {
+  captchaKey: string;
+  trackWidth: number;
+  sliderWidth: number;
+  expiresInSeconds: number;
+  captchaToken?: string;
+}
+
+export interface SliderCaptchaVerifyDTO {
+  captchaKey: string;
+  sliderX: number;
 }
 
 // ========== Post ==========
