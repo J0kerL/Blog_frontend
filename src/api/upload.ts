@@ -6,7 +6,7 @@ export const uploadApi = {
     const form = new FormData();
     form.append("file", file);
     return http
-      .post<ApiResult<string>>("/admin/upload", form, {
+      .post<ApiResult<string>>("/user/upload", form, {
         headers: { "Content-Type": "multipart/form-data" },
       })
       .then((r) => r.data.data);
