@@ -1,6 +1,7 @@
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { usePost, usePostBySlug } from "@/hooks/usePosts";
 import { useAuthStore } from "@/store/authStore";
+import { useQueryClient } from "@tanstack/react-query";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
 import TableOfContents from "@/components/TableOfContents";
 import CommentSection from "@/components/CommentSection";
@@ -23,8 +24,16 @@ export default function PostDetail() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuthStore();
+  const queryClient = useQueryClient();
   const isAdmin = user?.role === "ROLE_ADMIN";
   const fromAdmin = (location.state as LocationState)?.from === "admin";
+
+  // 离开详情页时使文章列表缓存失效，确保浏览量等数据更新
+  useEffect(() => {
+    return () => {
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+    };
+  }, [queryClient]);
 
   // 始终调用两个Hook以避免条件Hook调用
   const { data: postBySlug, isLoading: isLoadingBySlug } = usePostBySlug(slug);
